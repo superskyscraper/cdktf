@@ -2,12 +2,14 @@ import { DbSubnetGroup } from '@cdktf/provider-aws/lib/db-subnet-group';
 import { AwsProvider } from '@cdktf/provider-aws/lib/provider';
 import { RdsCluster } from '@cdktf/provider-aws/lib/rds-cluster';
 import { RdsClusterInstance } from '@cdktf/provider-aws/lib/rds-cluster-instance';
-import { TerraformStack, TerraformVariable } from 'cdktf';
+import { S3Backend, TerraformStack, TerraformVariable } from 'cdktf';
 import { Construct } from 'constructs';
+import { s3BackendConfig } from '../types/tfstateconfig';
 
 interface rdsConfig {
   region: string;
   projectPrefix: string;
+  backendConfig: s3BackendConfig;
   subnetIds: string[];
   vpcSecurityGroupIds: string[];
 }
@@ -16,11 +18,18 @@ export class rdsStack extends TerraformStack {
   constructor(scope: Construct, id: string, config: rdsConfig) {
     super(scope, id);
 
-    const { region, projectPrefix, subnetIds, vpcSecurityGroupIds } = config;
+    const { region, projectPrefix, backendConfig, subnetIds, vpcSecurityGroupIds } = config;
 
     // define resources here
     new AwsProvider(this, 'AWS', {
       region: region,
+    });
+
+    new S3Backend(this, {
+      bucket: backendConfig.bucket,
+      key: backendConfig.key,
+      region: backendConfig.region,
+      dynamodbTable: backendConfig.dynamodbTable,
     });
 
     const dbSubnetGroup = new DbSubnetGroup(this, 'dbSubGrp', {

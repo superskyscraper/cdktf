@@ -1,15 +1,17 @@
 import { Construct } from 'constructs';
-import { TerraformStack } from 'cdktf';
+import { S3Backend, TerraformStack } from 'cdktf';
 import { AwsProvider } from '@cdktf/provider-aws/lib/provider';
 import { Vpc } from '@cdktf/provider-aws/lib/vpc';
 import { Subnet } from '@cdktf/provider-aws/lib/subnet';
 import { RouteTable } from '@cdktf/provider-aws/lib/route-table';
 import { InternetGateway } from '@cdktf/provider-aws/lib/internet-gateway';
 import { RouteTableAssociation } from '@cdktf/provider-aws/lib/route-table-association';
+import { s3BackendConfig } from '../types/tfstateconfig';
 
 interface vpcConfig {
   region: string;
   projectPrefix: string;
+  backendConfig: s3BackendConfig;
 }
 
 export class vpcStack extends TerraformStack {
@@ -20,11 +22,18 @@ export class vpcStack extends TerraformStack {
   constructor(scope: Construct, id: string, config: vpcConfig) {
     super(scope, id);
 
-    const { region, projectPrefix } = config;
+    const { region, projectPrefix, backendConfig } = config;
 
     // define resources here
     new AwsProvider(this, 'AWS', {
       region: region,
+    });
+
+    new S3Backend(this, {
+      bucket: backendConfig.bucket,
+      key: backendConfig.key,
+      region: backendConfig.region,
+      dynamodbTable: backendConfig.dynamodbTable,
     });
 
     //VPC

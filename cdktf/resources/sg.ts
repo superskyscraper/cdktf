@@ -1,12 +1,14 @@
 import { securityGroup } from '@cdktf/provider-aws';
 import { AwsProvider } from '@cdktf/provider-aws/lib/provider';
 import { SecurityGroup } from '@cdktf/provider-aws/lib/security-group';
-import { TerraformStack } from 'cdktf';
+import { S3Backend, TerraformStack } from 'cdktf';
 import { Construct } from 'constructs';
+import { s3BackendConfig } from '../types/tfstateconfig';
 
 interface sgConfig {
   region: string;
   projectPrefix: string;
+  backendConfig: s3BackendConfig;
   vpcId: string;
 }
 
@@ -16,11 +18,18 @@ export class sgStack extends TerraformStack {
   constructor(scope: Construct, id: string, config: sgConfig) {
     super(scope, id);
 
-    const { region, projectPrefix, vpcId } = config;
+    const { region, projectPrefix, backendConfig, vpcId } = config;
 
     // define resources here
     new AwsProvider(this, 'AWS', {
       region: region,
+    });
+
+    new S3Backend(this, {
+      bucket: backendConfig.bucket,
+      key: backendConfig.key,
+      region: backendConfig.region,
+      dynamodbTable: backendConfig.dynamodbTable,
     });
 
     //security group to access DB

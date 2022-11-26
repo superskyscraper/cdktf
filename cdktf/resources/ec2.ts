@@ -1,11 +1,13 @@
 import { Instance } from '@cdktf/provider-aws/lib/instance';
 import { AwsProvider } from '@cdktf/provider-aws/lib/provider';
-import { TerraformStack } from 'cdktf';
+import { S3Backend, TerraformStack } from 'cdktf';
 import { Construct } from 'constructs';
+import { s3BackendConfig } from '../types/tfstateconfig';
 
 interface ec2Config {
   region: string;
   projectPrefix: string;
+  backendConfig: s3BackendConfig;
   ssmIAMInstanceProfile: string;
   subnetId: string;
   vpcSecurityGroupIds: string[];
@@ -15,11 +17,18 @@ export class ec2Stack extends TerraformStack {
   constructor(scope: Construct, id: string, config: ec2Config) {
     super(scope, id);
 
-    const { region, projectPrefix, ssmIAMInstanceProfile, subnetId, vpcSecurityGroupIds } = config;
+    const { region, projectPrefix, ssmIAMInstanceProfile, backendConfig, subnetId, vpcSecurityGroupIds } = config;
 
     // define resources here
     new AwsProvider(this, 'AWS', {
       region: region,
+    });
+
+    new S3Backend(this, {
+      bucket: backendConfig.bucket,
+      key: backendConfig.key,
+      region: backendConfig.region,
+      dynamodbTable: backendConfig.dynamodbTable,
     });
 
     //EC2 which can be accessed via only ssm

@@ -3,12 +3,14 @@ import { IamInstanceProfile } from '@cdktf/provider-aws/lib/iam-instance-profile
 import { IamRole } from '@cdktf/provider-aws/lib/iam-role';
 import { IamRolePolicyAttachment } from '@cdktf/provider-aws/lib/iam-role-policy-attachment';
 import { AwsProvider } from '@cdktf/provider-aws/lib/provider';
-import { TerraformStack } from 'cdktf';
+import { S3Backend, TerraformStack } from 'cdktf';
 import { Construct } from 'constructs';
+import { s3BackendConfig } from '../types/tfstateconfig';
 
 interface iamConfig {
   region: string;
   projectPrefix: string;
+  backendConfig: s3BackendConfig;
 }
 
 export class iamStack extends TerraformStack {
@@ -16,11 +18,18 @@ export class iamStack extends TerraformStack {
   constructor(scope: Construct, id: string, config: iamConfig) {
     super(scope, id);
 
-    const { region, projectPrefix } = config;
+    const { region, projectPrefix, backendConfig } = config;
 
     // define resources here
     new AwsProvider(this, 'AWS', {
       region: region,
+    });
+
+    new S3Backend(this, {
+      bucket: backendConfig.bucket,
+      key: backendConfig.key,
+      region: backendConfig.region,
+      dynamodbTable: backendConfig.dynamodbTable,
     });
 
     // const ssmAssumeRole = new DataAwsIamPolicyDocument(this, 'ssmAssumeRole', {

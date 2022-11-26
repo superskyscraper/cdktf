@@ -1,0 +1,102 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: S3 Bucket and DynamoDB for Terraform state files.
+Parameters:
+  S3BucketName: # tfstateファイルを保持するためのS3バケット名
+    Type: String
+    Description: Bucket name
+    MinLength: 3
+    MaxLength: 63
+    Default: myultrasupertfstatemanages3
+  DynamoDBTableName: # ロック管理用のDynamoDBテーブル名
+    Type: String
+    Description: Table name
+    MinLength: 3
+    MaxLength: 63
+    Default: TerraformStateLockTable
+Resources:
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName:
+        Ref: S3BucketName
+      VersioningConfiguration: # 過去のtfstateファイルをVersioningで保持する
+        Status: Enabled
+      Tags:
+        - Key: Name
+          Value: !Sub |-
+            Terraform backend S3 bucket for ${AWS::AccountId}
+  DynamoDBTableVPC:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub ${DynamoDBTableName}-vpc
+      ProvisionedThroughput: # Terraformが利用するだけであれば読み書きパフォーマンスは最小で十分
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+      AttributeDefinitions: # ロック用列名(Terraformで決まっているので変更不可)
+        -
+          AttributeName: "LockID"
+          AttributeType: "S"
+      KeySchema:
+        -
+          AttributeName: "LockID"
+          KeyType: "HASH"
+  DynamoDBTableSG:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub ${DynamoDBTableName}-sg
+      ProvisionedThroughput: # Terraformが利用するだけであれば読み書きパフォーマンスは最小で十分
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+      AttributeDefinitions: # ロック用列名(Terraformで決まっているので変更不可)
+        -
+          AttributeName: "LockID"
+          AttributeType: "S"
+      KeySchema:
+        -
+          AttributeName: "LockID"
+          KeyType: "HASH"
+  DynamoDBTableIAM:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub ${DynamoDBTableName}-iam
+      ProvisionedThroughput: # Terraformが利用するだけであれば読み書きパフォーマンスは最小で十分
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+      AttributeDefinitions: # ロック用列名(Terraformで決まっているので変更不可)
+        -
+          AttributeName: "LockID"
+          AttributeType: "S"
+      KeySchema:
+        -
+          AttributeName: "LockID"
+          KeyType: "HASH"
+  DynamoDBTableEC2:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub ${DynamoDBTableName}-ec2
+      ProvisionedThroughput: # Terraformが利用するだけであれば読み書きパフォーマンスは最小で十分
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+      AttributeDefinitions: # ロック用列名(Terraformで決まっているので変更不可)
+        -
+          AttributeName: "LockID"
+          AttributeType: "S"
+      KeySchema:
+        -
+          AttributeName: "LockID"
+          KeyType: "HASH"
+  DynamoDBTableRDS:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub ${DynamoDBTableName}-rds
+      ProvisionedThroughput: # Terraformが利用するだけであれば読み書きパフォーマンスは最小で十分
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+      AttributeDefinitions: # ロック用列名(Terraformで決まっているので変更不可)
+        -
+          AttributeName: "LockID"
+          AttributeType: "S"
+      KeySchema:
+        -
+          AttributeName: "LockID"
+          KeyType: "HASH"
