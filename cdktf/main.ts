@@ -4,6 +4,7 @@ import { App } from 'cdktf';
 
 import { ec2Stack } from './resources/ec2';
 import { iamStack } from './resources/iam';
+import { rdsStack } from './resources/rds';
 import { sgStack } from './resources/sg';
 import { vpcStack } from './resources/vpc';
 
@@ -32,8 +33,15 @@ const ec2 = new ec2Stack(app, 'ec2Stack', {
   region: region,
   projectPrefix: projectPrefix,
   ssmIAMInstanceProfile: iam.ssmIAMInstanceProfile.name,
-  publicSubnetId: vpc.publicSubnet1a.id,
-  securityGroupId: sg.sgAccessDB.id,
+  subnetId: vpc.publicSubnet1a.id,
+  vpcSecurityGroupIds: [sg.sgAccessDB.id],
+});
+
+const rds = new rdsStack(app, 'rdsStack', {
+  region: region,
+  projectPrefix: projectPrefix,
+  subnetIds: [vpc.privateSubnet1a.id, vpc.privateSubnet1c.id],
+  vpcSecurityGroupIds: [sg.sgDB.id],
 });
 
 app.synth();

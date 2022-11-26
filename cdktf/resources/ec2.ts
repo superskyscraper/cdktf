@@ -7,15 +7,15 @@ interface ec2Config {
   region: string;
   projectPrefix: string;
   ssmIAMInstanceProfile: string;
-  publicSubnetId: string;
-  securityGroupId: string;
+  subnetId: string;
+  vpcSecurityGroupIds: string[];
 }
 
 export class ec2Stack extends TerraformStack {
   constructor(scope: Construct, id: string, config: ec2Config) {
     super(scope, id);
 
-    const { region, projectPrefix, ssmIAMInstanceProfile, publicSubnetId, securityGroupId } = config;
+    const { region, projectPrefix, ssmIAMInstanceProfile, subnetId, vpcSecurityGroupIds } = config;
 
     // define resources here
     new AwsProvider(this, 'AWS', {
@@ -26,9 +26,9 @@ export class ec2Stack extends TerraformStack {
     const publicEC2Instance = new Instance(this, 'pubEC2', {
       ami: 'ami-072bfb8ae2c884cc4',
       instanceType: 't2.micro',
-      subnetId: publicSubnetId,
+      subnetId: subnetId,
       iamInstanceProfile: ssmIAMInstanceProfile,
-      securityGroups: [securityGroupId],
+      vpcSecurityGroupIds: vpcSecurityGroupIds,
       associatePublicIpAddress: true,
       userData: `
         #!/bin/bash

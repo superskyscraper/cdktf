@@ -20,3 +20,6 @@
 
 - ユーザ変更
 `sudo su --login ec2-user`
+
+### DB接続
+`psql -h localhost -p 5432 -U postgres -d postgres`
