@@ -14,6 +14,9 @@ interface vpcConfig {
 
 export class vpcStack extends TerraformStack {
   public mainVpc: Vpc;
+  public publicSubnet1a: Subnet;
+  public privateSubnet1a: Subnet;
+  public privateSubnet1c: Subnet;
   constructor(scope: Construct, id: string, config: vpcConfig) {
     super(scope, id);
 
@@ -34,7 +37,7 @@ export class vpcStack extends TerraformStack {
     });
 
     //subnet
-    const publicSubnet1a = new Subnet(this, 'pubSub1a', {
+    this.publicSubnet1a = new Subnet(this, 'pubSub1a', {
       vpcId: this.mainVpc.id,
       cidrBlock: '10.0.1.0/24',
       availabilityZone: 'ap-northeast-1a',
@@ -43,7 +46,7 @@ export class vpcStack extends TerraformStack {
       },
     });
 
-    const privateSubnet1a = new Subnet(this, 'priSub1a', {
+    this.privateSubnet1a = new Subnet(this, 'priSub1a', {
       vpcId: this.mainVpc.id,
       cidrBlock: '10.0.2.0/24',
       availabilityZone: 'ap-northeast-1a',
@@ -52,7 +55,7 @@ export class vpcStack extends TerraformStack {
       },
     });
 
-    const privateSubnet1c = new Subnet(this, 'priSub1c', {
+    this.privateSubnet1c = new Subnet(this, 'priSub1c', {
       vpcId: this.mainVpc.id,
       cidrBlock: '10.0.3.0/24',
       availabilityZone: 'ap-northeast-1c',
@@ -93,17 +96,17 @@ export class vpcStack extends TerraformStack {
     //routetable associate
     new RouteTableAssociation(this, 'pubAssociate', {
       routeTableId: publicRouteTable.id,
-      subnetId: publicSubnet1a.id,
+      subnetId: this.publicSubnet1a.id,
     });
 
     new RouteTableAssociation(this, 'priAssociate1a', {
       routeTableId: privateRouteTable.id,
-      subnetId: privateSubnet1a.id,
+      subnetId: this.privateSubnet1a.id,
     });
 
     new RouteTableAssociation(this, 'priAssociate1c', {
       routeTableId: privateRouteTable.id,
-      subnetId: privateSubnet1c.id,
+      subnetId: this.privateSubnet1c.id,
     });
   }
 }

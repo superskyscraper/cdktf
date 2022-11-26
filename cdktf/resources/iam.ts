@@ -1,7 +1,5 @@
 import { DataAwsIamPolicy } from '@cdktf/provider-aws/lib/data-aws-iam-policy';
-import { DataAwsIamPolicyDocument } from '@cdktf/provider-aws/lib/data-aws-iam-policy-document';
 import { IamInstanceProfile } from '@cdktf/provider-aws/lib/iam-instance-profile';
-import { IamPolicy } from '@cdktf/provider-aws/lib/iam-policy';
 import { IamRole } from '@cdktf/provider-aws/lib/iam-role';
 import { IamRolePolicyAttachment } from '@cdktf/provider-aws/lib/iam-role-policy-attachment';
 import { AwsProvider } from '@cdktf/provider-aws/lib/provider';
@@ -14,7 +12,7 @@ interface iamConfig {
 }
 
 export class iamStack extends TerraformStack {
-  // public ssmIAMInstanceProfile: IamInstanceProfile;
+  public ssmIAMInstanceProfile: IamInstanceProfile;
   constructor(scope: Construct, id: string, config: iamConfig) {
     super(scope, id);
 
@@ -66,7 +64,7 @@ export class iamStack extends TerraformStack {
       policyArn: systemManager.arn,
     });
 
-    const ssmIAMInstanceProfile = new IamInstanceProfile(this, 'ssmIAMInstanceProfile', {
+    this.ssmIAMInstanceProfile = new IamInstanceProfile(this, 'ssmIAMInstanceProfile', {
       name: 'ssmIAMInstanceProfile',
       role: ssmRole.name,
     });
