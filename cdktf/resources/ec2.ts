@@ -12,7 +12,6 @@ interface ec2Config {
 }
 
 export class ec2Stack extends TerraformStack {
-  // public ssmIAMInstanceProfile: IamInstanceProfile;
   constructor(scope: Construct, id: string, config: ec2Config) {
     super(scope, id);
 
