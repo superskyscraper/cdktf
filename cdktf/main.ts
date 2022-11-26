@@ -1,6 +1,7 @@
 // Copyright (c) HashiCorp, Inc
 // SPDX-License-Identifier: MPL-2.0
 import { App } from 'cdktf';
+import { sgStack } from './resources/sg';
 
 import { vpcStack } from './resources/vpc';
 
@@ -29,9 +30,15 @@ const region = 'ap-northeast-1';
 
 const app = new App();
 
-const vpcstack = new vpcStack(app, 'vpcStack', {
+const vpc = new vpcStack(app, 'vpcStack', {
   region: region,
   projectPrefix: projectPrefix,
+});
+
+const sg = new sgStack(app, 'sgStack', {
+  region: region,
+  projectPrefix: projectPrefix,
+  vpcId: vpc.mainVpc.id,
 });
 
 app.synth();

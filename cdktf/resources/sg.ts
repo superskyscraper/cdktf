@@ -1,4 +1,5 @@
 import { AwsProvider } from '@cdktf/provider-aws/lib/provider';
+import { SecurityGroup } from '@cdktf/provider-aws/lib/security-group';
 import { TerraformStack } from 'cdktf';
 import { Construct } from 'constructs';
 
@@ -8,7 +9,7 @@ interface sgConfig {
   vpcId: string;
 }
 
-export class vpcStack extends TerraformStack {
+export class sgStack extends TerraformStack {
   constructor(scope: Construct, id: string, config: sgConfig) {
     super(scope, id);
 
@@ -17,6 +18,48 @@ export class vpcStack extends TerraformStack {
     // define resources here
     new AwsProvider(this, 'AWS', {
       region: region,
+    });
+
+    //security group to access DB
+    const sgAccessDB = new SecurityGroup(this, 'sgAccDB', {
+      description: 'security group to access DB',
+      vpcId: vpcId,
+      egress: [
+        {
+          fromPort: 0,
+          toPort: 0,
+          protocol: '-1',
+          cidrBlocks: ['0.0.0.0/0'],
+        },
+      ],
+      tags: {
+        Name: `${projectPrefix}-sgAccessDB`,
+      },
+    });
+
+    //security group for postgres DB
+    const sgDB = new SecurityGroup(this, 'sgDB', {
+      description: 'security group for postgres DB',
+      vpcId: vpcId,
+      ingress: [
+        {
+          fromPort: 5432,
+          toPort: 5432,
+          protocol: 'tcp',
+          securityGroups: [sgAccessDB.id],
+        },
+      ],
+      egress: [
+        {
+          fromPort: 0,
+          toPort: 0,
+          protocol: '-1',
+          cidrBlocks: ['0.0.0.0/0'],
+        },
+      ],
+      tags: {
+        Name: `${projectPrefix}-sgDB`,
+      },
     });
   }
 }
