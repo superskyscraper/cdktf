@@ -29,12 +29,12 @@ export class vpcStack extends TerraformStack {
       region: region,
     });
 
-    new S3Backend(this, {
-      bucket: backendConfig.bucket,
-      key: backendConfig.key,
-      region: backendConfig.region,
-      dynamodbTable: backendConfig.dynamodbTable,
-    });
+    // new S3Backend(this, {
+    //   bucket: backendConfig.bucket,
+    //   key: backendConfig.key,
+    //   region: backendConfig.region,
+    //   dynamodbTable: backendConfig.dynamodbTable,
+    // });
 
     //VPC
     this.mainVpc = new Vpc(this, 'mainVpc', {

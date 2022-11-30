@@ -25,12 +25,12 @@ export class sgStack extends TerraformStack {
       region: region,
     });
 
-    new S3Backend(this, {
-      bucket: backendConfig.bucket,
-      key: backendConfig.key,
-      region: backendConfig.region,
-      dynamodbTable: backendConfig.dynamodbTable,
-    });
+    // new S3Backend(this, {
+    //   bucket: backendConfig.bucket,
+    //   key: backendConfig.key,
+    //   region: backendConfig.region,
+    //   dynamodbTable: backendConfig.dynamodbTable,
+    // });
 
     //security group to access DB
     this.sgAccessDB = new SecurityGroup(this, 'sgAccDB', {

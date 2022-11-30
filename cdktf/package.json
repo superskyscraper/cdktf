@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@cdktf/provider-aws": "11.0.0",
+    "@cdktf/provider-null": "^4.0.1",
     "cdktf": "^0.14.1",
     "constructs": "^10.1.168"
   },

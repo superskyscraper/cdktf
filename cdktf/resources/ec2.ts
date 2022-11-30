@@ -24,12 +24,12 @@ export class ec2Stack extends TerraformStack {
       region: region,
     });
 
-    new S3Backend(this, {
-      bucket: backendConfig.bucket,
-      key: backendConfig.key,
-      region: backendConfig.region,
-      dynamodbTable: backendConfig.dynamodbTable,
-    });
+    // new S3Backend(this, {
+    //   bucket: backendConfig.bucket,
+    //   key: backendConfig.key,
+    //   region: backendConfig.region,
+    //   dynamodbTable: backendConfig.dynamodbTable,
+    // });
 
     //EC2 which can be accessed via only ssm
     const publicEC2Instance = new Instance(this, 'pubEC2', {

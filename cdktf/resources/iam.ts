@@ -25,12 +25,12 @@ export class iamStack extends TerraformStack {
       region: region,
     });
 
-    new S3Backend(this, {
-      bucket: backendConfig.bucket,
-      key: backendConfig.key,
-      region: backendConfig.region,
-      dynamodbTable: backendConfig.dynamodbTable,
-    });
+    // new S3Backend(this, {
+    //   bucket: backendConfig.bucket,
+    //   key: backendConfig.key,
+    //   region: backendConfig.region,
+    //   dynamodbTable: backendConfig.dynamodbTable,
+    // });
 
     // const ssmAssumeRole = new DataAwsIamPolicyDocument(this, 'ssmAssumeRole', {
     //   statement: [
