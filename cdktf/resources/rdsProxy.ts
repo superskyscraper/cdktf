@@ -45,12 +45,12 @@ export class rdsProxyStack extends TerraformStack {
     });
 
     if (useS3Backend) {
-      // new S3Backend(this, {
-      //   bucket: backendConfig.bucket,
-      //   key: backendConfig.key,
-      //   region: backendConfig.region,
-      //   dynamodbTable: backendConfig.dynamodbTable,
-      // });
+      new S3Backend(this, {
+        bucket: backendConfig.bucket,
+        key: backendConfig.key,
+        region: backendConfig.region,
+        dynamodbTable: backendConfig.dynamodbTable,
+      });
     }
 
     const dbProxySecret = new SecretsmanagerSecret(this, 'dbProxySecret', {

@@ -41,4 +41,10 @@ export const tfstateConfigValues: tfstateConfig = {
     key: 'rds/rdsStack.tfstate',
     dynamodbTable: `${tfstateDynamoDBName}-rds`,
   },
+  proxy: {
+    bucket: tfstateS3BucketName,
+    region: region,
+    key: 'proxy/rdsProxyStack.tfstate',
+    dynamodbTable: `${tfstateDynamoDBName}-proxy`,
+  },
 };
