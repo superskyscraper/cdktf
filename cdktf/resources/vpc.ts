@@ -12,6 +12,7 @@ interface vpcConfig {
   region: string;
   projectPrefix: string;
   backendConfig: s3BackendConfig;
+  useS3Backend?: boolean;
 }
 
 export class vpcStack extends TerraformStack {
@@ -22,19 +23,21 @@ export class vpcStack extends TerraformStack {
   constructor(scope: Construct, id: string, config: vpcConfig) {
     super(scope, id);
 
-    const { region, projectPrefix, backendConfig } = config;
+    const { region, projectPrefix, backendConfig, useS3Backend } = config;
 
     // define resources here
     new AwsProvider(this, 'AWS', {
       region: region,
     });
 
-    new S3Backend(this, {
-      bucket: backendConfig.bucket,
-      key: backendConfig.key,
-      region: backendConfig.region,
-      dynamodbTable: backendConfig.dynamodbTable,
-    });
+    if (useS3Backend) {
+      new S3Backend(this, {
+        bucket: backendConfig.bucket,
+        key: backendConfig.key,
+        region: backendConfig.region,
+        dynamodbTable: backendConfig.dynamodbTable,
+      });
+    }
 
     //VPC
     this.mainVpc = new Vpc(this, 'mainVpc', {

@@ -7,6 +7,7 @@ import { iamStack } from './resources/iam';
 import { rdsStack } from './resources/rds';
 import { sgStack } from './resources/sg';
 import { vpcStack } from './resources/vpc';
+import { rdsProxyStack } from './resources/rdsProxy';
 import { projectPrefix, region, tfstateConfigValues } from './constants';
 
 const app = new App();
@@ -45,6 +46,17 @@ const rds = new rdsStack(app, 'rdsStack', {
   backendConfig: tfstateConfigValues.rds,
   subnetIds: [vpc.privateSubnet1a.id, vpc.privateSubnet1c.id],
   vpcSecurityGroupIds: [sg.sgDB.id],
+});
+
+const proxy = new rdsProxyStack(app, 'rdsProxyStack', {
+  region: region,
+  projectPrefix: projectPrefix,
+  backendConfig: tfstateConfigValues.ec2,
+  subnetIds: [vpc.privateSubnet1a.id, vpc.privateSubnet1c.id],
+  vpcSecurityGroupIds: [sg.sgDB.id],
+  rdsCluster: rds.rdsCluster,
+  rdsClusterInstance: rds.rdsClusterInstace,
+  dbProxyIamRole: iam.iamRoleForDBProxy,
 });
 
 app.synth();

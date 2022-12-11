@@ -11,25 +11,29 @@ interface ec2Config {
   ssmIAMInstanceProfile: string;
   subnetId: string;
   vpcSecurityGroupIds: string[];
+  useS3Backend?: boolean;
 }
 
 export class ec2Stack extends TerraformStack {
   constructor(scope: Construct, id: string, config: ec2Config) {
     super(scope, id);
 
-    const { region, projectPrefix, ssmIAMInstanceProfile, backendConfig, subnetId, vpcSecurityGroupIds } = config;
+    const { region, projectPrefix, ssmIAMInstanceProfile, backendConfig, subnetId, vpcSecurityGroupIds, useS3Backend } =
+      config;
 
     // define resources here
     new AwsProvider(this, 'AWS', {
       region: region,
     });
 
-    new S3Backend(this, {
-      bucket: backendConfig.bucket,
-      key: backendConfig.key,
-      region: backendConfig.region,
-      dynamodbTable: backendConfig.dynamodbTable,
-    });
+    if (useS3Backend) {
+      new S3Backend(this, {
+        bucket: backendConfig.bucket,
+        key: backendConfig.key,
+        region: backendConfig.region,
+        dynamodbTable: backendConfig.dynamodbTable,
+      });
+    }
 
     //EC2 which can be accessed via only ssm
     const publicEC2Instance = new Instance(this, 'pubEC2', {

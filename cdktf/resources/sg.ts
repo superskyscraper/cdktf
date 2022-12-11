@@ -10,6 +10,7 @@ interface sgConfig {
   projectPrefix: string;
   backendConfig: s3BackendConfig;
   vpcId: string;
+  useS3Backend?: boolean;
 }
 
 export class sgStack extends TerraformStack {
@@ -18,19 +19,21 @@ export class sgStack extends TerraformStack {
   constructor(scope: Construct, id: string, config: sgConfig) {
     super(scope, id);
 
-    const { region, projectPrefix, backendConfig, vpcId } = config;
+    const { region, projectPrefix, backendConfig, vpcId, useS3Backend } = config;
 
     // define resources here
     new AwsProvider(this, 'AWS', {
       region: region,
     });
 
-    new S3Backend(this, {
-      bucket: backendConfig.bucket,
-      key: backendConfig.key,
-      region: backendConfig.region,
-      dynamodbTable: backendConfig.dynamodbTable,
-    });
+    if (useS3Backend) {
+      new S3Backend(this, {
+        bucket: backendConfig.bucket,
+        key: backendConfig.key,
+        region: backendConfig.region,
+        dynamodbTable: backendConfig.dynamodbTable,
+      });
+    }
 
     //security group to access DB
     this.sgAccessDB = new SecurityGroup(this, 'sgAccDB', {

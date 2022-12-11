@@ -12,25 +12,30 @@ interface rdsConfig {
   backendConfig: s3BackendConfig;
   subnetIds: string[];
   vpcSecurityGroupIds: string[];
+  useS3Backend?: boolean;
 }
 
 export class rdsStack extends TerraformStack {
+  public rdsCluster: RdsCluster;
+  public rdsClusterInstace: RdsClusterInstance;
   constructor(scope: Construct, id: string, config: rdsConfig) {
     super(scope, id);
 
-    const { region, projectPrefix, backendConfig, subnetIds, vpcSecurityGroupIds } = config;
+    const { region, projectPrefix, backendConfig, subnetIds, vpcSecurityGroupIds, useS3Backend } = config;
 
     // define resources here
     new AwsProvider(this, 'AWS', {
       region: region,
     });
 
-    new S3Backend(this, {
-      bucket: backendConfig.bucket,
-      key: backendConfig.key,
-      region: backendConfig.region,
-      dynamodbTable: backendConfig.dynamodbTable,
-    });
+    if (useS3Backend) {
+      new S3Backend(this, {
+        bucket: backendConfig.bucket,
+        key: backendConfig.key,
+        region: backendConfig.region,
+        dynamodbTable: backendConfig.dynamodbTable,
+      });
+    }
 
     const dbSubnetGroup = new DbSubnetGroup(this, 'dbSubGrp', {
       subnetIds: subnetIds,
@@ -59,7 +64,7 @@ export class rdsStack extends TerraformStack {
       sensitive: true,
     });
 
-    const rdsCluster = new RdsCluster(this, 'rdsCluster', {
+    this.rdsCluster = new RdsCluster(this, 'rdsCluster', {
       clusterIdentifier: `${projectPrefix}serverless2`,
       engine: 'aurora-postgresql',
       engineMode: 'provisioned',
@@ -80,11 +85,11 @@ export class rdsStack extends TerraformStack {
       },
     });
 
-    new RdsClusterInstance(this, 'rdsClusterInstance1', {
-      clusterIdentifier: rdsCluster.id,
+    this.rdsClusterInstace = new RdsClusterInstance(this, 'rdsClusterInstance1', {
+      clusterIdentifier: this.rdsCluster.id,
       instanceClass: 'db.serverless',
-      engine: rdsCluster.engine,
-      engineVersion: rdsCluster.engineVersion,
+      engine: this.rdsCluster.engine,
+      engineVersion: this.rdsCluster.engineVersion,
       dbSubnetGroupName: dbSubnetGroup.name,
     });
   }
