@@ -47,6 +47,7 @@ export class ec2Stack extends TerraformStack {
         #!/bin/bash
         yum update -y
         yum update amazon-ssm-agent
+        yum install -y postgresql
       `,
       tags: {
         Name: `${projectPrefix}-EC2`,
