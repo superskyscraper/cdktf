@@ -1,15 +1,13 @@
 import { AwsProvider } from '@cdktf/provider-aws/lib/provider';
-import { S3Backend, TerraformStack, TerraformVariable } from 'cdktf';
+import { S3Backend, TerraformStack } from 'cdktf';
 import { s3BackendConfig } from '../types/tfstateconfig';
 import { Construct } from 'constructs';
 import { SecretsmanagerSecret } from '@cdktf/provider-aws/lib/secretsmanager-secret';
-import { SecretsmanagerSecretVersion } from '@cdktf/provider-aws/lib/secretsmanager-secret-version';
 import { RdsCluster } from '@cdktf/provider-aws/lib/rds-cluster';
 import { DbProxy } from '@cdktf/provider-aws/lib/db-proxy';
 import { DbProxyDefaultTargetGroup } from '@cdktf/provider-aws/lib/db-proxy-default-target-group';
 import { DbProxyTarget } from '@cdktf/provider-aws/lib/db-proxy-target';
 import { IamRole } from '@cdktf/provider-aws/lib/iam-role';
-import { RdsClusterInstance } from '@cdktf/provider-aws/lib/rds-cluster-instance';
 
 interface rdsProxyConfig {
   region: string;
@@ -19,8 +17,8 @@ interface rdsProxyConfig {
   vpcSecurityGroupIds: string[];
   useS3Backend?: boolean;
   rdsCluster: RdsCluster;
-  rdsClusterInstance: RdsClusterInstance;
   dbProxyIamRole: IamRole;
+  dbProxySecret: SecretsmanagerSecret;
 }
 
 export class rdsProxyStack extends TerraformStack {
@@ -35,8 +33,8 @@ export class rdsProxyStack extends TerraformStack {
       vpcSecurityGroupIds,
       useS3Backend,
       rdsCluster,
-      rdsClusterInstance,
       dbProxyIamRole,
+      dbProxySecret,
     } = config;
 
     // define resources here
@@ -53,25 +51,8 @@ export class rdsProxyStack extends TerraformStack {
       });
     }
 
-    const dbProxySecret = new SecretsmanagerSecret(this, 'dbProxySecret', {
-      name: projectPrefix + 'Secrets2',
-      recoveryWindowInDays: 0,
-    });
-
-    const dbProxySecretVersion = new SecretsmanagerSecretVersion(this, 'dbProxySecretVersion', {
-      secretId: dbProxySecret.id,
-      secretString: JSON.stringify({
-        username: rdsCluster.masterUsername,
-        password: rdsCluster.masterPassword,
-        engine: rdsCluster.engine,
-        host: rdsCluster.endpoint,
-        port: rdsCluster.port,
-        dbInstanceIdentifier: rdsCluster.id,
-      }),
-    });
-
+    //RDSProxy
     const dbProxy = new DbProxy(this, 'dbProxy', {
-      // dependsOn: [rdsClusterInstance],
       name: `dbproxy`,
       debugLogging: false,
       engineFamily: 'POSTGRESQL',

@@ -7,7 +7,9 @@ import { iamStack } from './resources/iam';
 import { rdsStack } from './resources/rds';
 import { sgStack } from './resources/sg';
 import { vpcStack } from './resources/vpc';
-import { rdsProxyStack } from './resources/rdsProxy';
+import { secretsManagerStack } from './resources/secretsmanager';
+import { rdsProxyStack } from './resources/rdsproxy';
+
 import { projectPrefix, region, tfstateConfigValues } from './constants';
 
 const app = new App();
@@ -48,15 +50,22 @@ const rds = new rdsStack(app, 'rdsStack', {
   vpcSecurityGroupIds: [sg.sgDB.id],
 });
 
-const proxy = new rdsProxyStack(app, 'rdsProxyStack', {
+const secretsmanager = new secretsManagerStack(app, 'secretsManagerStack', {
   region: region,
   projectPrefix: projectPrefix,
-  backendConfig: tfstateConfigValues.proxy,
+  backendConfig: tfstateConfigValues.secretsmanager,
+  rdsCluster: rds.rdsCluster,
+});
+
+const rdsproxy = new rdsProxyStack(app, 'rdsProxyStack', {
+  region: region,
+  projectPrefix: projectPrefix,
+  backendConfig: tfstateConfigValues.rdsproxy,
   subnetIds: [vpc.privateSubnet1a.id, vpc.privateSubnet1c.id],
   vpcSecurityGroupIds: [sg.sgDBProxy.id],
   rdsCluster: rds.rdsCluster,
-  rdsClusterInstance: rds.rdsClusterInstace,
   dbProxyIamRole: iam.iamRoleForDBProxy,
+  dbProxySecret: secretsmanager.dbProxySecret,
 });
 
 app.synth();

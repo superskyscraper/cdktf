@@ -11,5 +11,6 @@ export interface tfstateConfig {
   iam: s3BackendConfig;
   ec2: s3BackendConfig;
   rds: s3BackendConfig;
-  proxy: s3BackendConfig;
+  secretsmanager: s3BackendConfig;
+  rdsproxy: s3BackendConfig;
 }
