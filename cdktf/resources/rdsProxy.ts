@@ -54,7 +54,7 @@ export class rdsProxyStack extends TerraformStack {
     }
 
     const dbProxySecret = new SecretsmanagerSecret(this, 'dbProxySecret', {
-      name: projectPrefix + 'Secrets',
+      name: projectPrefix + 'Secrets2',
       recoveryWindowInDays: 0,
     });
 

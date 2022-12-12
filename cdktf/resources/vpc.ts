@@ -63,7 +63,7 @@ export class vpcStack extends TerraformStack {
       cidrBlock: '10.0.2.0/24',
       availabilityZone: 'ap-northeast-1a',
       tags: {
-        Name: `${projectPrefix}-pubSub1a`,
+        Name: `${projectPrefix}-priSub1a`,
       },
     });
 

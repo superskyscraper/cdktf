@@ -53,7 +53,7 @@ const proxy = new rdsProxyStack(app, 'rdsProxyStack', {
   projectPrefix: projectPrefix,
   backendConfig: tfstateConfigValues.proxy,
   subnetIds: [vpc.privateSubnet1a.id, vpc.privateSubnet1c.id],
-  vpcSecurityGroupIds: [sg.sgDB.id],
+  vpcSecurityGroupIds: [sg.sgDBProxy.id],
   rdsCluster: rds.rdsCluster,
   rdsClusterInstance: rds.rdsClusterInstace,
   dbProxyIamRole: iam.iamRoleForDBProxy,

@@ -1,4 +1,4 @@
-import { tfstateConfig } from './types/tfstateconfig';
+import type { tfstateConfig } from './types/tfstateconfig';
 
 //リソースに紐づけるプロジェクト名
 export const projectPrefix = 'cdktfsample';

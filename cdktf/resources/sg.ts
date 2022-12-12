@@ -16,6 +16,7 @@ interface sgConfig {
 export class sgStack extends TerraformStack {
   public sgAccessDB: SecurityGroup;
   public sgDB: SecurityGroup;
+  public sgDBProxy: SecurityGroup;
   constructor(scope: Construct, id: string, config: sgConfig) {
     super(scope, id);
 
@@ -52,6 +53,31 @@ export class sgStack extends TerraformStack {
       },
     });
 
+    //security group for DBProxy
+    this.sgDBProxy = new SecurityGroup(this, 'sgDBProxy', {
+      description: 'security group for DBProxy',
+      vpcId: vpcId,
+      ingress: [
+        {
+          fromPort: 5432,
+          toPort: 5432,
+          protocol: 'tcp',
+          securityGroups: [this.sgAccessDB.id],
+        },
+      ],
+      egress: [
+        {
+          fromPort: 0,
+          toPort: 0,
+          protocol: '-1',
+          cidrBlocks: ['0.0.0.0/0'],
+        },
+      ],
+      tags: {
+        Name: `${projectPrefix}-sgDBProxy`,
+      },
+    });
+
     //security group for postgres DB
     this.sgDB = new SecurityGroup(this, 'sgDB', {
       description: 'security group for postgres DB',
@@ -61,7 +87,7 @@ export class sgStack extends TerraformStack {
           fromPort: 5432,
           toPort: 5432,
           protocol: 'tcp',
-          securityGroups: [this.sgAccessDB.id],
+          securityGroups: [this.sgDBProxy.id, this.sgAccessDB.id],
         },
       ],
       egress: [
