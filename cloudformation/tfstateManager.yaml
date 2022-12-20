@@ -130,3 +130,33 @@ Resources:
         -
           AttributeName: "LockID"
           KeyType: "HASH"
+  DynamoDBTableS3:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub ${DynamoDBTableName}-s3
+      ProvisionedThroughput: # Terraformが利用するだけであれば読み書きパフォーマンスは最小で十分
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+      AttributeDefinitions: # ロック用列名(Terraformで決まっているので変更不可)
+        -
+          AttributeName: "LockID"
+          AttributeType: "S"
+      KeySchema:
+        -
+          AttributeName: "LockID"
+          KeyType: "HASH"
+  DynamoDBTableCloudfront:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub ${DynamoDBTableName}-cloudfront
+      ProvisionedThroughput: # Terraformが利用するだけであれば読み書きパフォーマンスは最小で十分
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+      AttributeDefinitions: # ロック用列名(Terraformで決まっているので変更不可)
+        -
+          AttributeName: "LockID"
+          AttributeType: "S"
+      KeySchema:
+        -
+          AttributeName: "LockID"
+          KeyType: "HASH"

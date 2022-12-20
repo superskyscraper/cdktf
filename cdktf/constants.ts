@@ -50,7 +50,19 @@ export const tfstateConfigValues: tfstateConfig = {
   rdsproxy: {
     bucket: tfstateS3BucketName,
     region: region,
-    key: 'rdsproxy/rdspRoxyStack.tfstate',
+    key: 'rdsproxy/rdsProxyStack.tfstate',
     dynamodbTable: `${tfstateDynamoDBName}-rdsproxy`,
+  },
+  s3: {
+    bucket: tfstateS3BucketName,
+    region: region,
+    key: 's3/s3Stack.tfstate',
+    dynamodbTable: `${tfstateDynamoDBName}-s3`,
+  },
+  cloudfront: {
+    bucket: tfstateS3BucketName,
+    region: region,
+    key: 'cloudfront/cloudFrontStack.tfstate',
+    dynamodbTable: `${tfstateDynamoDBName}-cloudfront`,
   },
 };

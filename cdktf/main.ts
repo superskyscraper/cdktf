@@ -11,6 +11,7 @@ import { secretsManagerStack } from './resources/secretsmanager';
 import { rdsProxyStack } from './resources/rdsproxy';
 
 import { projectPrefix, region, tfstateConfigValues } from './constants';
+import { cloudfrontStack } from './resources/cloudfront';
 
 const app = new App();
 
@@ -66,6 +67,12 @@ const rdsproxy = new rdsProxyStack(app, 'rdsProxyStack', {
   rdsCluster: rds.rdsCluster,
   dbProxyIamRole: iam.iamRoleForDBProxy,
   dbProxySecret: secretsmanager.dbProxySecret,
+});
+
+const cloudfront = new cloudfrontStack(app, 'cloudfrontStack', {
+  region: region,
+  projectPrefix: projectPrefix,
+  backendConfig: tfstateConfigValues.cloudfront,
 });
 
 app.synth();

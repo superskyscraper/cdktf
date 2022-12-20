@@ -13,4 +13,6 @@ export interface tfstateConfig {
   rds: s3BackendConfig;
   secretsmanager: s3BackendConfig;
   rdsproxy: s3BackendConfig;
+  s3: s3BackendConfig;
+  cloudfront: s3BackendConfig;
 }
