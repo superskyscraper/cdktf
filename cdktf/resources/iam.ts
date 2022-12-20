@@ -86,7 +86,7 @@ export class iamStack extends TerraformStack {
     });
 
     /**
-     *ここからRdsProxyとRdsClusterをつなぐIAM設定;
+     * ここからRdsProxyとRdsClusterをつなぐIAM設定;
      * RdsProxyがSecretsManagerに登録したRdsClusterの認証情報を読み取る許可を出す
      */
     this.iamRoleForDBProxy = new IamRole(this, 'iamRoleForDBProxy', {

@@ -44,8 +44,10 @@ export class rdsStack extends TerraformStack {
       },
     });
 
-    //TF_VAR_masterUsername="hoge"をターミナルで定義する
-    //あるいは.bashrcでexportする
+    /**
+     * TF_VAR_masterUsername="hoge"をターミナルで定義する
+     * あるいは.bashrcでexportする
+     */
     const masterUsername = new TerraformVariable(this, 'masterUsername', {
       type: 'string',
       description: 'DB Username',
