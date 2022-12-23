@@ -23,41 +23,17 @@ export const tfstateConfigValues: tfstateConfig = {
     key: 'sg/sgStack.tfstate',
     dynamodbTable: `${tfstateDynamoDBName}-sg`,
   },
-  iam: {
+  bastion: {
     bucket: tfstateS3BucketName,
     region: region,
-    key: 'iam/iamStack.tfstate',
-    dynamodbTable: `${tfstateDynamoDBName}-iam`,
-  },
-  ec2: {
-    bucket: tfstateS3BucketName,
-    region: region,
-    key: 'ec2/ec2Stack.tfstate',
-    dynamodbTable: `${tfstateDynamoDBName}-ec2`,
+    key: 'bastion/bastionStack.tfstate',
+    dynamodbTable: `${tfstateDynamoDBName}-bastion`,
   },
   rds: {
     bucket: tfstateS3BucketName,
     region: region,
     key: 'rds/rdsStack.tfstate',
     dynamodbTable: `${tfstateDynamoDBName}-rds`,
-  },
-  secretsmanager: {
-    bucket: tfstateS3BucketName,
-    region: region,
-    key: 'secretsmanager/secretsManagerStack.tfstate',
-    dynamodbTable: `${tfstateDynamoDBName}-secretsmanager`,
-  },
-  rdsproxy: {
-    bucket: tfstateS3BucketName,
-    region: region,
-    key: 'rdsproxy/rdsProxyStack.tfstate',
-    dynamodbTable: `${tfstateDynamoDBName}-rdsproxy`,
-  },
-  s3: {
-    bucket: tfstateS3BucketName,
-    region: region,
-    key: 's3/s3Stack.tfstate',
-    dynamodbTable: `${tfstateDynamoDBName}-s3`,
   },
   cloudfront: {
     bucket: tfstateS3BucketName,

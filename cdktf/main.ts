@@ -2,16 +2,13 @@
 // SPDX-License-Identifier: MPL-2.0
 import { App } from 'cdktf';
 
-import { ec2Stack } from './resources/ec2';
-import { iamStack } from './resources/iam';
+import { bastionStack } from './resources/bastion';
 import { rdsStack } from './resources/rds';
 import { sgStack } from './resources/sg';
 import { vpcStack } from './resources/vpc';
-import { secretsManagerStack } from './resources/secretsmanager';
-import { rdsProxyStack } from './resources/rdsproxy';
+import { cloudfrontStack } from './resources/cloudfront';
 
 import { projectPrefix, region, tfstateConfigValues } from './constants';
-import { cloudfrontStack } from './resources/cloudfront';
 
 const app = new App();
 
@@ -28,19 +25,13 @@ const sg = new sgStack(app, 'sgStack', {
   vpcId: vpc.mainVpc.id,
 });
 
-const iam = new iamStack(app, 'iamStack', {
-  region: region,
-  projectPrefix: projectPrefix,
-  backendConfig: tfstateConfigValues.iam,
-});
 
-const ec2 = new ec2Stack(app, 'ec2Stack', {
+const bastion = new bastionStack(app, 'bastionStack', {
   region: region,
   projectPrefix: projectPrefix,
-  backendConfig: tfstateConfigValues.ec2,
-  ssmIAMInstanceProfile: iam.ssmIAMInstanceProfile.name,
+  backendConfig: tfstateConfigValues.bastion,
   subnetId: vpc.publicSubnet1a.id,
-  vpcSecurityGroupIds: [sg.sgAccessDB.id],
+  vpcSecurityGroupIdsForEC2: [sg.sgAccessDB.id],
 });
 
 const rds = new rdsStack(app, 'rdsStack', {
@@ -48,25 +39,8 @@ const rds = new rdsStack(app, 'rdsStack', {
   projectPrefix: projectPrefix,
   backendConfig: tfstateConfigValues.rds,
   subnetIds: [vpc.privateSubnet1a.id, vpc.privateSubnet1c.id],
-  vpcSecurityGroupIds: [sg.sgDB.id],
-});
-
-const secretsmanager = new secretsManagerStack(app, 'secretsManagerStack', {
-  region: region,
-  projectPrefix: projectPrefix,
-  backendConfig: tfstateConfigValues.secretsmanager,
-  rdsCluster: rds.rdsCluster,
-});
-
-const rdsproxy = new rdsProxyStack(app, 'rdsProxyStack', {
-  region: region,
-  projectPrefix: projectPrefix,
-  backendConfig: tfstateConfigValues.rdsproxy,
-  subnetIds: [vpc.privateSubnet1a.id, vpc.privateSubnet1c.id],
-  vpcSecurityGroupIds: [sg.sgDBProxy.id],
-  rdsCluster: rds.rdsCluster,
-  dbProxyIamRole: iam.iamRoleForDBProxy,
-  dbProxySecret: secretsmanager.dbProxySecret,
+  vpcSecurityGroupIdsForRds: [sg.sgDB.id],
+  vpcSecurityGroupIdsForProxy:[sg.sgDBProxy.id],
 });
 
 const cloudfront = new cloudfrontStack(app, 'cloudfrontStack', {

@@ -55,25 +55,10 @@ Resources:
         -
           AttributeName: "LockID"
           KeyType: "HASH"
-  DynamoDBTableIAM:
+  DynamoDBTableBastion:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: !Sub ${DynamoDBTableName}-iam
-      ProvisionedThroughput: # Terraformが利用するだけであれば読み書きパフォーマンスは最小で十分
-        ReadCapacityUnits: 1
-        WriteCapacityUnits: 1
-      AttributeDefinitions: # ロック用列名(Terraformで決まっているので変更不可)
-        -
-          AttributeName: "LockID"
-          AttributeType: "S"
-      KeySchema:
-        -
-          AttributeName: "LockID"
-          KeyType: "HASH"
-  DynamoDBTableEC2:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      TableName: !Sub ${DynamoDBTableName}-ec2
+      TableName: !Sub ${DynamoDBTableName}-bastion
       ProvisionedThroughput: # Terraformが利用するだけであれば読み書きパフォーマンスは最小で十分
         ReadCapacityUnits: 1
         WriteCapacityUnits: 1
@@ -89,51 +74,6 @@ Resources:
     Type: AWS::DynamoDB::Table
     Properties:
       TableName: !Sub ${DynamoDBTableName}-rds
-      ProvisionedThroughput: # Terraformが利用するだけであれば読み書きパフォーマンスは最小で十分
-        ReadCapacityUnits: 1
-        WriteCapacityUnits: 1
-      AttributeDefinitions: # ロック用列名(Terraformで決まっているので変更不可)
-        -
-          AttributeName: "LockID"
-          AttributeType: "S"
-      KeySchema:
-        -
-          AttributeName: "LockID"
-          KeyType: "HASH"
-  DynamoDBTableSecretsManager:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      TableName: !Sub ${DynamoDBTableName}-secretsmanager
-      ProvisionedThroughput: # Terraformが利用するだけであれば読み書きパフォーマンスは最小で十分
-        ReadCapacityUnits: 1
-        WriteCapacityUnits: 1
-      AttributeDefinitions: # ロック用列名(Terraformで決まっているので変更不可)
-        -
-          AttributeName: "LockID"
-          AttributeType: "S"
-      KeySchema:
-        -
-          AttributeName: "LockID"
-          KeyType: "HASH"
-  DynamoDBTableRDSProxy:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      TableName: !Sub ${DynamoDBTableName}-rdsproxy
-      ProvisionedThroughput: # Terraformが利用するだけであれば読み書きパフォーマンスは最小で十分
-        ReadCapacityUnits: 1
-        WriteCapacityUnits: 1
-      AttributeDefinitions: # ロック用列名(Terraformで決まっているので変更不可)
-        -
-          AttributeName: "LockID"
-          AttributeType: "S"
-      KeySchema:
-        -
-          AttributeName: "LockID"
-          KeyType: "HASH"
-  DynamoDBTableS3:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      TableName: !Sub ${DynamoDBTableName}-s3
       ProvisionedThroughput: # Terraformが利用するだけであれば読み書きパフォーマンスは最小で十分
         ReadCapacityUnits: 1
         WriteCapacityUnits: 1

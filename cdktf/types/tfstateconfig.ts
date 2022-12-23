@@ -8,11 +8,7 @@ export interface s3BackendConfig {
 export interface tfstateConfig {
   vpc: s3BackendConfig;
   sg: s3BackendConfig;
-  iam: s3BackendConfig;
-  ec2: s3BackendConfig;
+  bastion: s3BackendConfig;
   rds: s3BackendConfig;
-  secretsmanager: s3BackendConfig;
-  rdsproxy: s3BackendConfig;
-  s3: s3BackendConfig;
   cloudfront: s3BackendConfig;
 }
