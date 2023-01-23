@@ -11,4 +11,5 @@ export interface tfstateConfig {
   bastion: s3BackendConfig;
   rds: s3BackendConfig;
   cloudfront: s3BackendConfig;
+  cognito: s3BackendConfig;
 }

@@ -41,4 +41,10 @@ export const tfstateConfigValues: tfstateConfig = {
     key: 'cloudfront/cloudFrontStack.tfstate',
     dynamodbTable: `${tfstateDynamoDBName}-cloudfront`,
   },
+  cognito: {
+    bucket: tfstateS3BucketName,
+    region: region,
+    key: 'cognito/cognitoStack.tfstate',
+    dynamodbTable: `${tfstateDynamoDBName}-cognito`,
+  },
 };

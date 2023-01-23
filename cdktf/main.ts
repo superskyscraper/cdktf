@@ -7,6 +7,7 @@ import { rdsStack } from './resources/rds';
 import { sgStack } from './resources/sg';
 import { vpcStack } from './resources/vpc';
 import { cloudfrontStack } from './resources/cloudfront';
+import { cognitoStack } from './resources/cognito';
 
 import { projectPrefix, region, tfstateConfigValues } from './constants';
 
@@ -25,7 +26,6 @@ const sg = new sgStack(app, 'sgStack', {
   vpcId: vpc.mainVpc.id,
 });
 
-
 const bastion = new bastionStack(app, 'bastionStack', {
   region: region,
   projectPrefix: projectPrefix,
@@ -40,7 +40,7 @@ const rds = new rdsStack(app, 'rdsStack', {
   backendConfig: tfstateConfigValues.rds,
   subnetIds: [vpc.privateSubnet1a.id, vpc.privateSubnet1c.id],
   vpcSecurityGroupIdsForRds: [sg.sgDB.id],
-  vpcSecurityGroupIdsForProxy:[sg.sgDBProxy.id],
+  vpcSecurityGroupIdsForProxy: [sg.sgDBProxy.id],
 });
 
 const cloudfront = new cloudfrontStack(app, 'cloudfrontStack', {
@@ -48,5 +48,11 @@ const cloudfront = new cloudfrontStack(app, 'cloudfrontStack', {
   projectPrefix: projectPrefix,
   backendConfig: tfstateConfigValues.cloudfront,
 });
+
+// const cognito = new cognitoStack(app, 'cognitoStack', {
+//   region: region,
+//   projectPrefix: projectPrefix,
+//   backendConfig: tfstateConfigValues.cognito,
+// });
 
 app.synth();
