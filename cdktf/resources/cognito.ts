@@ -3,6 +3,7 @@ import { S3Backend, TerraformStack } from 'cdktf';
 import { Construct } from 'constructs';
 import { s3BackendConfig } from '../types/tfstateconfig';
 import { CognitoUserPool } from '@cdktf/provider-aws/lib/cognito-user-pool';
+import { CognitoUserPoolClient } from '@cdktf/provider-aws/lib/cognito-user-pool-client';
 
 interface cognitoConfig {
   region: string;
@@ -31,17 +32,25 @@ export class cognitoStack extends TerraformStack {
       });
     }
 
+    /**
+     * cognitoユーザプール
+     */
     const cognitoUserPool = new CognitoUserPool(this, 'cognitoUserPool', {
       name: `${projectPrefix}-Auth`,
 
+      /** MFAはOFFにする */
       mfaConfiguration: 'OFF',
 
-      aliasAttributes: ['email'],
-
+      /** ユーザ確認の際にemailで自動検証を行う */
       autoVerifiedAttributes: ['email'],
 
+      /** emailでサインイン可能にする */
+      usernameAttributes: ['email'],
+
       adminCreateUserConfig: {
-        allowAdminCreateUserOnly: false,
+        /** 管理者以外のでのサインアップは禁止 */
+        allowAdminCreateUserOnly: true,
+        /** 正体メールのテンプレート */
         inviteMessageTemplate: {
           emailMessage: ' ユーザー名は {username}、仮パスワードは {####} です。',
           emailSubject: ' 仮パスワード',
@@ -50,9 +59,11 @@ export class cognitoStack extends TerraformStack {
       },
 
       emailConfiguration: {
+        /** メール配信の設定はデフォルトにする */
         emailSendingAccount: 'COGNITO_DEFAULT',
       },
 
+      /** パスワードのポリシー */
       passwordPolicy: {
         minimumLength: 8,
         requireLowercase: true,
@@ -62,6 +73,24 @@ export class cognitoStack extends TerraformStack {
         temporaryPasswordValidityDays: 7,
       },
 
+      /**
+       * パスワード再設定用の設定
+       * emailを使用する
+       */
+      accountRecoverySetting: {
+        recoveryMechanism: [
+          {
+            name: 'verified_email',
+            priority: 1,
+          },
+        ],
+      },
+
+      /**
+       * ユーザに付与する属性
+       * emailは必須とする
+       * カスタム属性は必須ではない
+       */
       schema: [
         {
           attributeDataType: 'String',
@@ -82,17 +111,29 @@ export class cognitoStack extends TerraformStack {
       ],
 
       usernameConfiguration: {
+        /** ユーザ名で大文字小文字を区別しない */
         caseSensitive: false,
       },
 
+      /** パスワード再設定時のメール文面 */
       verificationMessageTemplate: {
-        defaultEmailOption: 'CONFIRM_WITH_LINK',
+        defaultEmailOption: 'CONFIRM_WITH_CODE',
         emailMessage: ' 検証コードは {####} です。',
-        emailMessageByLink: ' E メールアドレスを検証するには、次のリンクをクリックしてください。{##Verify Email##} ',
         emailSubject: ' 検証コード',
-        emailSubjectByLink: ' 検証リンク',
         smsMessage: ' 検証コードは {####} です。',
       },
+    });
+
+    /** cognitoのアプリクライアント */
+    const cognitoUserPoolClient = new CognitoUserPoolClient(this, 'cognitoUserPoolClient', {
+      name: `${projectPrefix}-app`,
+      userPoolId: cognitoUserPool.id,
+      /** secretは使用しない */
+      generateSecret: false,
+      /** SRPとリフレッシュトークンだけ有効 */
+      explicitAuthFlows: ['ALLOW_REFRESH_TOKEN_AUTH', 'ALLOW_USER_SRP_AUTH'],
+      /** ユーザ存在エラーを防ぐ */
+      preventUserExistenceErrors: 'ENABLED',
     });
   }
 }

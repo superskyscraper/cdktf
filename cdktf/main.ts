@@ -49,10 +49,10 @@ const cloudfront = new cloudfrontStack(app, 'cloudfrontStack', {
   backendConfig: tfstateConfigValues.cloudfront,
 });
 
-// const cognito = new cognitoStack(app, 'cognitoStack', {
-//   region: region,
-//   projectPrefix: projectPrefix,
-//   backendConfig: tfstateConfigValues.cognito,
-// });
+const cognito = new cognitoStack(app, 'cognitoStack', {
+  region: region,
+  projectPrefix: projectPrefix,
+  backendConfig: tfstateConfigValues.cognito,
+});
 
 app.synth();
